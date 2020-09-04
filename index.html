@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Video Reel</title>
+<script type="text/javascript">
+window.addEventListener('load', eventWindowLoaded, false);
+let videoElement;
+let videoDiv;
+let playing;
+
+function eventWindowLoaded() {
+    playing = false;
+
+    // To get video permissions
+    // navigator.getUserMedia({ video: true }, () => {}, () => {});
+
+    // Add video element and div to DOM
+    videoElement = document.createElement("video");
+    let videoDiv = document.createElement('div');
+    document.body.appendChild(videoDiv);
+    videoDiv.appendChild(videoElement);
+    videoDiv.setAttribute("style", "position: absolute; top: 50px; left: 50px; ");
+    videoElement.setAttribute("loop", "true");
+
+    let videoType = supportedVideoFormat(videoElement);
+    if (videoType == "") {
+        alert("no video support");
+        return;
+    }
+    videoElement.setAttribute("src", "assets/test.mp4");
+    videoElement.addEventListener("canplay canplaythrough",videoLoaded,false);
+
+    // If the video is in the cache of the browser,
+    // the 'canplaythrough' event might have been triggered
+    // before we registered the event handler.
+    if (videoElement.readyState > 3) {
+        videoLoaded();
+    }
+}
+
+
+function supportedVideoFormat(video) {
+   let returnExtension = "";
+   if (video.canPlayType("video/webm") =="probably" || 
+       video.canPlayType("video/webm") == "maybe") {
+         returnExtension = "webm";
+   } else if(video.canPlayType("video/mp4") == "probably" || 
+       video.canPlayType("video/mp4") == "maybe") {
+         returnExtension = "mp4";
+   } else if(video.canPlayType("video/ogg") =="probably" || 
+       video.canPlayType("video/ogg") == "maybe") {
+         returnExtension = "ogg";
+   }
+
+   return returnExtension;
+
+}
+
+function videoLoaded() {
+   canvasApp();
+}
+
+function canvasApp() {
+    videoElement.setAttribute("style", "display: none");
+
+    function  drawScreen () {
+        // Background
+        context.fillStyle = '#000000';
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        // Box
+        context.strokeStyle = '#000000';
+        // Video
+        context.drawImage(videoElement , 0, 0);
+        // Text
+        context.fillStyle = "#000000";
+        context.fillText  ("Duration:" + videoElement.duration,  10 ,280);
+        context.fillText  ("Current time:" + videoElement.currentTime,  260 ,280);
+        context.fillText  ("Loop: " + videoElement.loop,  10 ,290);
+        context.fillText  ("Autoplay: " + videoElement.autoplay,  100 ,290);
+        context.fillText  ("Muted: " + videoElement.muted,  180 ,290);
+        context.fillText  ("Controls: " + videoElement.controls,  260 ,290);
+        context.fillText  ("Volume: " + videoElement.volume,  340 ,290);
+
+        // Play prompt
+        if (playing == false) {
+            context.fillStyle = "#ffffff";
+            context.fillText  ("Click here to start playing video", canvas.width/2-100, canvas.height/2);
+        }
+    }
+
+   let canvas = document.getElementById("canvasOne");
+   let context = canvas.getContext("2d");
+
+   //Function to get the mouse position
+    function getMousePos(canvas, event) {
+        const rect = canvas.getBoundingClientRect();
+        return {
+            x: event.clientX - rect.left,
+            y: event.clientY - rect.top
+        };
+    }
+
+    //The rectangle should have x,y,width,height properties
+    const rect = {
+        x:250,
+        y:350,
+        width:200,
+        height:100
+    };
+    //Binding the click event on the canvas
+    canvas.addEventListener('click', function(evt) {
+        // Play video
+        videoElement.onplay = function() {
+            playing = true;
+        };
+        videoElement.play();
+
+        const mousePos = getMousePos(canvas, evt);
+
+    }, false);
+
+   setInterval(drawScreen, 33);
+}
+
+</script>
+
+</head>
+<body>
+
+<canvas id="canvasOne" width="500" height="300">
+ Your browser does not support HTML5 Canvas.
+</canvas>
+</div>
+</body>
+</html>
