@@ -29,7 +29,7 @@ function eventWindowLoaded() {
         return;
     }
     videoElement.setAttribute("src", "assets/test.mp4");
-    videoElement.addEventListener("canplay canplaythrough",videoLoaded,false);
+    videoElement.addEventListener("canplaythrough",videoLoaded,false);
 
     // If the video is in the cache of the browser,
     // the 'canplaythrough' event might have been triggered
